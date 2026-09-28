@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow sensitive or build paths
+Disallow: /dist/
+Disallow: /node_modules/
+
+# Host & Sitemap location
+Host: https://ceylonheaventours.com
+Sitemap: https://ceylonheaventours.com/sitemap.xml
