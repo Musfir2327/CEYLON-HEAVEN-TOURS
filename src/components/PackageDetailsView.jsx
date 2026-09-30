@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PACKAGES } from '../data/travelData';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedPackage, getLocalizedPackages } from '../utils/localizeData';
-import sigiriya1 from '../assets/images/sigiriya 1.webp';
+import sigiriya1 from '../assets/images/sigiriya-1.webp';
 import kandy1 from '../assets/images/damro.webp';
 import mirissa from '../assets/images/mirissa.webp';
 import ninearch from '../assets/images/ninearch.webp';
@@ -315,9 +315,9 @@ export default function PackageDetailsView({ packageData: rawPackageData, onBack
                   <Phone className="w-3.5 h-3.5 text-[#0284C7]" />
                   <span className="font-mono">+94 76 066 0003</span>
                 </a>
-                <a href="mailto:inquiry@ceylonheaventours.com" className="flex items-center gap-2 text-slate-700 font-medium hover:text-[#0284C7] transition-colors">
+                <a href="mailto:inquiries@ceylonheaventours.com" className="flex items-center gap-2 text-slate-700 font-medium hover:text-[#0284C7] transition-colors">
                   <Mail className="w-3.5 h-3.5 text-[#0284C7]" />
-                  <span className="text-[11px] truncate">inquiry@ceylonheaventours.com</span>
+                  <span className="text-[11px] truncate">inquiries@ceylonheaventours.com</span>
                 </a>
               </div>
 

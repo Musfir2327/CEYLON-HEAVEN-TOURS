@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, Users, Search, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import heroBg from '../assets/images/sigiriya 3.webp';
+import heroBg from '../assets/images/sigiriya-3.webp';
 
 export default function HeroSection({ onSearch }) {
   const { t } = useLanguage();

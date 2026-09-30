@@ -12,8 +12,9 @@ export default function Footer() {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (email) {
+      let success = false;
       try {
-        await fetch('https://formsubmit.co/ajax/inquiry@ceylonheaventours.com', {
+        const response = await fetch('https://formsubmit.co/ajax/inquiries@ceylonheaventours.com', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -22,17 +23,25 @@ export default function Footer() {
           body: JSON.stringify({
             _subject: 'New VIP Travel Club Subscription Request',
             _replyto: email,
+            _captcha: 'false',
+            _template: 'table',
             'Subscriber Email': email,
             'Subscription Type': 'VIP Travel Club Newsletter'
           })
         });
+        const data = await response.json();
+        if (response.ok || data.success === 'true' || data.success === true) {
+          success = true;
+        }
       } catch (err) {
         console.warn('FormSubmit newsletter error:', err);
       }
 
-      const subject = encodeURIComponent('VIP Travel Club Subscription Request');
-      const body = encodeURIComponent(`Please subscribe my email to Ceylon Heaven VIP Travel Club:\n\nEmail: ${email}`);
-      window.location.href = `mailto:inquiry@ceylonheaventours.com?subject=${subject}&body=${body}`;
+      if (!success) {
+        const subject = encodeURIComponent('VIP Travel Club Subscription Request');
+        const body = encodeURIComponent(`Please subscribe my email to Ceylon Heaven VIP Travel Club:\n\nEmail: ${email}`);
+        window.location.href = `mailto:inquiries@ceylonheaventours.com?subject=${subject}&body=${body}`;
+      }
 
       setSubscribed(true);
       setTimeout(() => setSubscribed(false), 5000);
@@ -188,9 +197,9 @@ export default function Footer() {
                 <Phone className="w-4 h-4 text-[#0284C7] flex-shrink-0" />
                 <span className="font-mono font-medium">+94 76 066 0003</span>
               </a>
-              <a href="mailto:inquiry@ceylonheaventours.com" className="flex items-center gap-2.5 hover:text-[#0284C7] transition-colors">
+              <a href="mailto:inquiries@ceylonheaventours.com" className="flex items-center gap-2.5 hover:text-[#0284C7] transition-colors">
                 <Mail className="w-4 h-4 text-[#0284C7] flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-medium break-all">inquiry@ceylonheaventours.com</span>
+                <span className="text-xs sm:text-sm font-medium break-all">inquiries@ceylonheaventours.com</span>
               </a>
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-[#0284C7] flex-shrink-0" />

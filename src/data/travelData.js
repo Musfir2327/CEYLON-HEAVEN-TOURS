@@ -23,27 +23,27 @@ import colombo_dayTourImg from '../assets/images/colombo.webp';
 import galle_dayTourImg from '../assets/images/galle.webp';
 
 import ramayanaImg from '../assets/images/ramayana.webp';
-import koneshvaramImg from '../assets/images/koneshvaram kovil.webp';
-import eastCoastImg from '../assets/images/east coast.webp';
+import koneshvaramImg from '../assets/images/koneshvaram-kovil.webp';
+import eastCoastImg from '../assets/images/east-coast.webp';
 import elephantImg from '../assets/images/elephent.webp';
 import ellaImg from '../assets/images/ella.webp';
 import damroImg from '../assets/images/damro.webp';
-import kandy1Img from '../assets/images/kandy 1.webp';
-import kandy2Img from '../assets/images/kandy 2.webp';
-import kandy3Img from '../assets/images/kandy 3.webp';
+import kandy1Img from '../assets/images/kandy-1.webp';
+import kandy2Img from '../assets/images/kandy-2.webp';
+import kandy3Img from '../assets/images/kandy-3.webp';
 import mirissaImg from '../assets/images/mirissa.webp';
 import maduImg from '../assets/images/madu.webp';
-import nineArch2Img from '../assets/images/ninearch 2.webp';
+import nineArch2Img from '../assets/images/ninearch-2.webp';
 import nineArchImg from '../assets/images/ninearch.webp';
 import pinnawelaImg from '../assets/images/pinnawela.webp';
 import rawanellaImg from '../assets/images/rawanella.webp';
-import safari2Img from '../assets/images/safary 2.webp';
+import safari2Img from '../assets/images/safary-2.webp';
 import safariImg from '../assets/images/safary.webp';
-import sigiriya1Img from '../assets/images/sigiriya 1.webp';
-import sigiriya2Img from '../assets/images/sigiriya 2.webp';
-import sigiriya3Img from '../assets/images/sigiriya 3.webp';
-import sigiriya6Img from '../assets/images/sigiriya 6.webp';
-import sigiriya4Img from '../assets/images/sigirya 4.webp';
+import sigiriya1Img from '../assets/images/sigiriya-1.webp';
+import sigiriya2Img from '../assets/images/sigiriya-2.webp';
+import sigiriya3Img from '../assets/images/sigiriya-3.webp';
+import sigiriya6Img from '../assets/images/sigiriya-6.webp';
+import sigiriya4Img from '../assets/images/sigirya-4.webp';
 
 export const PACKAGE_CATEGORIES = [
   { id: 'pocket-friendly', label: 'Pocket Friendly', title: 'Budget-Friendly Adventures' },

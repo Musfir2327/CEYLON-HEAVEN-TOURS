@@ -17,6 +17,7 @@ export default function PackageBookingModal({ isOpen, onClose, selectedPackage }
     notes: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (selectedPackage) {
@@ -34,14 +35,15 @@ export default function PackageBookingModal({ isOpen, onClose, selectedPackage }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
+    let success = false;
+
+    // 1. Try server-side PHP mailer (Primary on cPanel host)
     try {
-      await fetch('https://formsubmit.co/ajax/inquiry@ceylonheaventours.com', {
+      const phpRes = await fetch('/send-email.php', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           _subject: `Package Booking Request: ${currentPackage.title} - ${formData.name}`,
           _replyto: formData.email,
@@ -51,28 +53,72 @@ export default function PackageBookingModal({ isOpen, onClose, selectedPackage }
           'Email Address': formData.email,
           'Phone / WhatsApp': formData.phone,
           'Departure Date': formData.date,
-          'Number of Guests': formData.guests
+          'Number of Guests': formData.guests,
+          'Special Notes': formData.notes || 'None'
         })
       });
+      const phpData = await phpRes.json();
+      if (phpRes.ok && (phpData.success === true || phpData.success === 'true')) {
+        success = true;
+      }
     } catch (err) {
-      console.warn('FormSubmit booking error:', err);
+      console.warn('PHP mailer fetch failed, trying FormSubmit:', err);
     }
 
-    const subject = encodeURIComponent(`Package Booking Request: ${currentPackage.title} - ${formData.name}`);
-    const body = encodeURIComponent(
-      `CEYLON HEAVEN TOURS - BOOKING REQUEST\n` +
-      `------------------------------------\n` +
-      `Selected Package: ${currentPackage.title} (${currentPackage.price} / ${currentPackage.duration})\n` +
-      `Full Name: ${formData.name}\n` +
-      `Email Address: ${formData.email}\n` +
-      `Phone / WhatsApp: ${formData.phone}\n` +
-      `Departure Date: ${formData.date}\n` +
-      `Number of Guests: ${formData.guests}`
-    );
+    // 2. Try FormSubmit API if PHP mailer didn't succeed
+    if (!success) {
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/inquiries@ceylonheaventours.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            _subject: `Package Booking Request: ${currentPackage.title} - ${formData.name}`,
+            _replyto: formData.email,
+            _captcha: 'false',
+            _template: 'table',
+            'Selected Package': currentPackage.title,
+            'Package Price': `$${currentPackage.price}`,
+            'Full Name': formData.name,
+            'Email Address': formData.email,
+            'Phone / WhatsApp': formData.phone,
+            'Departure Date': formData.date,
+            'Number of Guests': formData.guests,
+            'Special Notes': formData.notes || 'None'
+          })
+        });
 
-    const mailtoUrl = `mailto:inquiry@ceylonheaventours.com?subject=${subject}&body=${body}`;
-    window.location.href = mailtoUrl;
+        const data = await response.json();
+        if (response.ok || data.success === 'true' || data.success === true) {
+          success = true;
+        }
+      } catch (err) {
+        console.warn('FormSubmit booking error:', err);
+      }
+    }
 
+    // 3. Fallback to mailto link if both server methods failed
+    if (!success) {
+      const subject = encodeURIComponent(`Package Booking Request: ${currentPackage.title} - ${formData.name}`);
+      const body = encodeURIComponent(
+        `CEYLON HEAVEN TOURS - BOOKING REQUEST\n` +
+        `------------------------------------\n` +
+        `Selected Package: ${currentPackage.title} (${currentPackage.price} / ${currentPackage.duration})\n` +
+        `Full Name: ${formData.name}\n` +
+        `Email Address: ${formData.email}\n` +
+        `Phone / WhatsApp: ${formData.phone}\n` +
+        `Departure Date: ${formData.date}\n` +
+        `Number of Guests: ${formData.guests}\n` +
+        `Special Notes: ${formData.notes || 'None'}`
+      );
+
+      const mailtoUrl = `mailto:inquiries@ceylonheaventours.com?subject=${subject}&body=${body}`;
+      window.location.href = mailtoUrl;
+    }
+
+    setIsSubmitting(false);
     setSubmitted(true);
   };
 
@@ -226,10 +272,11 @@ export default function PackageBookingModal({ isOpen, onClose, selectedPackage }
                 <div className="pt-2">
                   <button 
                     type="submit"
-                    className="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#0284C7] hover:bg-[#0369A1] disabled:bg-slate-400 text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{t('modals.confirmBooking', 'Confirm & Reserve')}</span>
+                    <span>{isSubmitting ? 'Sending Request...' : t('modals.confirmBooking', 'Confirm & Reserve')}</span>
                   </button>
                 </div>
               </form>

@@ -17,17 +17,19 @@ export default function ContactSection() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
+    let success = false;
+
+    // 1. Try server-side PHP mailer (Primary on cPanel host)
     try {
-      await fetch('https://formsubmit.co/ajax/inquiry@ceylonheaventours.com', {
+      const phpRes = await fetch('/send-email.php', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           _subject: `New Ceylon Heaven Tour Inquiry: ${formData.fullName} (${formData.packageInterestedIn})`,
           _replyto: formData.email,
@@ -40,26 +42,67 @@ export default function ContactSection() {
           'Special Requests / Message': formData.message
         })
       });
+      const phpData = await phpRes.json();
+      if (phpRes.ok && (phpData.success === true || phpData.success === 'true')) {
+        success = true;
+      }
     } catch (err) {
-      console.warn('Direct FormSubmit failed, falling back to mailto:', err);
+      console.warn('PHP mailer fetch failed, trying FormSubmit:', err);
     }
 
-    const subject = encodeURIComponent(`New Ceylon Heaven Tour Inquiry: ${formData.fullName} (${formData.packageInterestedIn})`);
-    const body = encodeURIComponent(
-      `CEYLON HEAVEN TOURS - INQUIRY DETAILS\n` +
-      `-------------------------------------\n` +
-      `Full Name: ${formData.fullName}\n` +
-      `Email Address: ${formData.email}\n` +
-      `Phone Number: ${formData.phone || 'Not provided'}\n` +
-      `Package Interested In: ${formData.packageInterestedIn}\n` +
-      `Number of Travelers: ${formData.adults}\n` +
-      `Travel Date: ${formData.departureDate}\n\n` +
-      `Message / Special Requests:\n${formData.message}`
-    );
+    // 2. Try FormSubmit API if PHP mailer didn't succeed
+    if (!success) {
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/inquiries@ceylonheaventours.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            _subject: `New Ceylon Heaven Tour Inquiry: ${formData.fullName} (${formData.packageInterestedIn})`,
+            _replyto: formData.email,
+            _captcha: 'false',
+            _template: 'table',
+            'Full Name': formData.fullName,
+            'Email Address': formData.email,
+            'Phone / WhatsApp': formData.phone || 'Not provided',
+            'Selected Package': formData.packageInterestedIn,
+            'Number of Travelers': formData.adults,
+            'Travel Date': formData.departureDate,
+            'Special Requests / Message': formData.message
+          })
+        });
 
-    const mailtoUrl = `mailto:inquiry@ceylonheaventours.com?subject=${subject}&body=${body}`;
-    window.location.href = mailtoUrl;
+        const data = await response.json();
+        if (response.ok || data.success === 'true' || data.success === true) {
+          success = true;
+        }
+      } catch (err) {
+        console.warn('Direct FormSubmit failed:', err);
+      }
+    }
 
+    // 3. Fallback to mailto link if both server methods failed
+    if (!success) {
+      const subject = encodeURIComponent(`New Ceylon Heaven Tour Inquiry: ${formData.fullName} (${formData.packageInterestedIn})`);
+      const body = encodeURIComponent(
+        `CEYLON HEAVEN TOURS - INQUIRY DETAILS\n` +
+        `-------------------------------------\n` +
+        `Full Name: ${formData.fullName}\n` +
+        `Email Address: ${formData.email}\n` +
+        `Phone Number: ${formData.phone || 'Not provided'}\n` +
+        `Package Interested In: ${formData.packageInterestedIn}\n` +
+        `Number of Travelers: ${formData.adults}\n` +
+        `Travel Date: ${formData.departureDate}\n\n` +
+        `Message / Special Requests:\n${formData.message}`
+      );
+
+      const mailtoUrl = `mailto:inquiries@ceylonheaventours.com?subject=${subject}&body=${body}`;
+      window.location.href = mailtoUrl;
+    }
+
+    setIsSubmitting(false);
     setSubmitted(true);
   };
 
@@ -95,7 +138,7 @@ export default function ContactSection() {
                 Travel Inquiry Received!
               </h3>
               <p className="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">
-                Thank you, <span className="font-bold text-slate-900">{formData.fullName}</span>! Your inquiry for <span className="font-bold text-[#0284C7]">{formData.packageInterestedIn}</span> has been forwarded to <span className="font-semibold text-slate-900">inquiry@ceylonheaventours.com</span>.
+                Thank you, <span className="font-bold text-slate-900">{formData.fullName}</span>! Your inquiry for <span className="font-bold text-[#0284C7]">{formData.packageInterestedIn}</span> has been forwarded to <span className="font-semibold text-slate-900">inquiries@ceylonheaventours.com</span>.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -255,10 +298,11 @@ export default function ContactSection() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white py-4 rounded-2xl font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full bg-[#0284C7] hover:bg-[#0369A1] disabled:bg-slate-400 text-white py-4 rounded-2xl font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                <span>{t('contact.sendBtn', 'Send Message')}</span>
+                <span>{isSubmitting ? 'Sending Request...' : t('contact.sendBtn', 'Send Message')}</span>
               </button>
 
               {/* Trust Footer Badges */}
@@ -353,7 +397,7 @@ export default function ContactSection() {
               </p>
               <p className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-amber-300" />
-                <span>inquiry@ceylonheaventours.com</span>
+                <span>inquiries@ceylonheaventours.com</span>
               </p>
               <p className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-amber-300" />

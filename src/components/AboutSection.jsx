@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldCheck, Award, Headset, Tag, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
-import sigiriyaImg from '../assets/images/sigiriya 2.webp';
+import sigiriyaImg from '../assets/images/sigiriya-2.webp';
 import kandyImg from '../assets/images/ramoboda.webp';
 import ellaImg from '../assets/images/ella.webp';
 import mirissaImg from '../assets/images/mirissa.webp';
